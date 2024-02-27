@@ -163,7 +163,6 @@ public class SwerveModule extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     SmartDashboard.putNumber(Constants.Swerve.modNames[moduleNumber] + "cancoder",
         round2dp(m_turnCancoder.getAbsolutePosition().getValueAsDouble(), 2));
     SmartDashboard.putNumber(Constants.Swerve.modNames[moduleNumber] + "intcoder",

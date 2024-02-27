@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
@@ -15,8 +13,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,7 +23,7 @@ import frc.robot.Constants;
 public class Swerve extends SubsystemBase {
   // The gyro sensor
 
-  private final AHRS gyro;
+  private final ADIS16448_IMU gyro;
 
   private SwerveDrivePoseEstimator swervePoseEstimator;
 
@@ -34,7 +32,7 @@ public class Swerve extends SubsystemBase {
   private Field2d field;
 
   public Swerve() {
-    gyro = new AHRS(SPI.Port.kMXP, (byte) 100);
+    gyro = new ADIS16448_IMU();
     zeroGyro();
 
     mSwerveMods = new SwerveModule[] {
@@ -164,8 +162,8 @@ public class Swerve extends SubsystemBase {
   }
 
   public Rotation2d getYaw() {
-    return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getYaw())
-        : Rotation2d.fromDegrees(gyro.getYaw());
+    return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - gyro.getGyroAngleZ())
+        : Rotation2d.fromDegrees(gyro.getGyroAngleZ());
   }
 
   public double getHeadingDegrees() {
