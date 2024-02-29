@@ -17,7 +17,7 @@ public class Pneumatics extends SubsystemBase {
   private final DoubleSolenoid blockSolenoid;
   public Pneumatics() {
     m_compressor = new Compressor(PneumaticsModuleType.CTREPCM);
-    liftSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2, 3);
+    liftSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 2);
     blockSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
   }
   public void startCompressor() {

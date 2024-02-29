@@ -56,7 +56,6 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // m_pneumatics.forwardBlockSolenoid();
     m_swerve.setDefaultCommand(
         new TeleopSwerve(
             m_swerve,
@@ -88,6 +87,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     /* Driver Buttons */
     zeroGyro.onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
+
 
     //SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
 
