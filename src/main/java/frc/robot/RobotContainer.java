@@ -56,6 +56,8 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // m_pneumatics.reverseLiftSolenoid();
+    m_pneumatics.forwardLiftSolenoid();;
     m_swerve.setDefaultCommand(
         new TeleopSwerve(
             m_swerve,
