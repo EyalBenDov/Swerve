@@ -46,7 +46,9 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
   /* Driver Buttons */
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton liftSolenoid = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+  private final JoystickButton blockSolenoid = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
 
   /* Subsystems */
   private final Swerve m_swerve = new Swerve();
@@ -56,8 +58,8 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // m_pneumatics.reverseLiftSolenoid();
-    m_pneumatics.forwardLiftSolenoid();;
+    m_pneumatics.reverseLiftSolenoid();
+    m_pneumatics.reverseBlockSolenoid();
     m_swerve.setDefaultCommand(
         new TeleopSwerve(
             m_swerve,
@@ -89,7 +91,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     /* Driver Buttons */
     zeroGyro.onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
-
+    liftSolenoid.onTrue(new InstantCommand(() -> m_pneumatics.toggleLiftSolenoid()));
+    blockSolenoid.onTrue(new InstantCommand(() -> m_pneumatics.toggleBlockSolenoid()));
 
     //SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
 
