@@ -16,14 +16,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.subsystems.*;
 
@@ -38,37 +38,39 @@ import frc.robot.subsystems.*;
  */
 public class RobotContainer {
   /* Controllers */
-  private final Joystick driver = new Joystick(0);
+  private final CommandJoystick driver = new CommandJoystick(0);
   private final SendableChooser<Command> autoChooser;
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
   /* Driver Buttons */
-  private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton liftSolenoid = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-  private final JoystickButton blockSolenoid = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-  private final JoystickButton grabMotors = new JoystickButton(driver, XboxController.Button.kB.value);
-  private final JoystickButton launchMotors = new JoystickButton(driver, XboxController.Button.kA.value);
+  private final Trigger zeroGyro = driver.button(2);
+  private final Trigger robotCentric = driver.button(3);
+  private final Trigger liftSolenoid = driver.button(6);
+  private final Trigger blockSolenoid = driver.button(1);
+  private final Trigger grabNote = driver.button(7);
+  private final Trigger launchNote = driver.button(8); 
+
   /* Subsystems */
   private final Swerve m_swerve = new Swerve();
   private final Pneumatics m_pneumatics = new Pneumatics();
   private final Launcher m_launcher = new Launcher();
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-
+    System.out.println(translationAxis);
+    System.out.println(strafeAxis);
+    System.out.println(rotationAxis);
     m_pneumatics.reverseLiftSolenoid();
     m_pneumatics.reverseBlockSolenoid();
     m_swerve.setDefaultCommand(
         new TeleopSwerve(
             m_swerve,
-            () -> -driver.getRawAxis(translationAxis),
+            () -> driver.getRawAxis(translationAxis),
             () -> -driver.getRawAxis(strafeAxis),
-            () -> -driver.getRawAxis(rotationAxis)/3,
+            () -> -driver.getRawAxis(rotationAxis-1)/3,
             () -> robotCentric.getAsBoolean()));
 
     // Configure the button bindings
@@ -80,6 +82,8 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
     SmartDashboard.putData("Auto Mode", autoChooser);
+    
+    
 
   }
 
@@ -93,14 +97,28 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    grabMotors.onTrue(new InstantCommand(() -> m_launcher.setGrabMotors()));
-    grabMotors.onFalse(new InstantCommand(() -> m_launcher.stopGrabMotors()));
-    launchMotors.onTrue(new InstantCommand(() -> m_launcher.setLaunchMotors()));
-    launchMotors.onFalse(new InstantCommand(() -> m_launcher.stopLaunchMotors()));
+    // switches on controller labled from left to right: leftmost is number one, next is number two when it is closest to the joystick, and 3 when furthest, next is 4 when closest to joystick, 5 when furthest, last is 6 when closest. 
+    // left button on bottom is 7, right button is 8
+    // Power buttons, dials don't seem to do anything
+    //left button pickup
+    // right button launch
+    // far right stick up-- activate hooks
+    // right stick down-- hooks down
+    // left stick-- blockers up blockers down
+    // 5 -> inverse 2
+    // 4 -> 3
+    // 1 -> inverse 1
+    // 0 -> 0
     zeroGyro.onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
     liftSolenoid.onTrue(new InstantCommand(() -> m_pneumatics.toggleLiftSolenoid()));
+    liftSolenoid.onFalse(new InstantCommand(() -> m_pneumatics.toggleLiftSolenoid()));
     blockSolenoid.onTrue(new InstantCommand(() -> m_pneumatics.toggleBlockSolenoid()));
-
+    blockSolenoid.onFalse(new InstantCommand(() -> m_pneumatics.toggleBlockSolenoid()));
+    grabNote.onTrue(new InstantCommand(() -> m_launcher.setGrabMotors()));
+    grabNote.onFalse(new InstantCommand(() -> m_launcher.stopGrabMotors()));
+    launchNote.onTrue(new InstantCommand(() -> m_launcher.setLaunchMotors()));
+    launchNote.onFalse(new InstantCommand(() -> m_launcher.stopLaunchMotors()));
+    
     //SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
 
     // Add a button to run pathfinding commands to SmartDashboard
@@ -150,8 +168,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    // return autoChooser.getSelected();
-    return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Test Path"));
+    return autoChooser.getSelected();
   }
 
 }
+
